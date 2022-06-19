@@ -1,7 +1,6 @@
 from functools import wraps
 
 from crypt import methods
-import json
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request, get_jwt
 from pymongo import MongoClient
@@ -61,8 +60,15 @@ def login():
 
 @app.route('/api/v1/loadUser', methods=['GET'])
 @jwt_required()
+#@verify_jwt_in_request()
 def loadUser():
-    return "Sign up"
+    user = get_jwt_identity()
+    user_data = users_collection.find_one({'username': user})
+    if user_data:
+        del user_data['_id'], user_data['password']
+        return jsonify({'profile': user_data}), 200
+    else:
+        return jsonify({'msg': 'Profile not found'}), 404
 
 @app.route('/api/v1/logout', methods=['DELETE'])
 @jwt_required()
