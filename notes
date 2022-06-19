@@ -1,0 +1,19 @@
+Not including addmin routes at the present.
+DB admin is responsible for adding, editing users and info
+Admin will post to one api route then if else will handle which task it is doing
+- adding user
+- deleting user
+- editing user info
+
+Need to figure out how to auth only the admin user to admin routes with jwt tokens
+
+@app.route("/admin", methods=["GET"])
+def adminPage():
+    return render_template('admin.html')
+
+    Invalid content-type. Must be application/json.; Missing 'jwt' query paramater)"}
+
+needs redis to be running
+
+Fix when editing a user having to specify every gear value. Should be able to only edit certain gear pieces. 
+

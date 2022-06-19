@@ -1,0 +1,7 @@
+Developed using python flask.
+
+All requirements found in requirements.txt
+
+Runs locally on port 8080
+
+Some features have not been fully fleshed out at this stage and bugs may occur. 

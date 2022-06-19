@@ -1,0 +1,2 @@
+For the routes have jwt required then simply check if user is admin. If yes then render template if no send back a 404
+Do this for the signup link and change it to /admin
