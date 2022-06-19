@@ -3,6 +3,7 @@ from functools import wraps
 
 import redis
 import secrets
+import certifi
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request, get_jwt, create_refresh_token, set_access_cookies
 from pymongo import MongoClient
@@ -20,9 +21,16 @@ bcrypt = Bcrypt(app)
 
 jwt = JWTManager(app)
 
-client = MongoClient("mongodb+srv://Dragon6:Dragon6@cluster0.koioa.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://Dragon6:Dragon6@cluster0.koioa.mongodb.net/?retryWrites=true&w=majority", tlsCAFile=certifi.where())
 db = client["sample_mflix"]
 users_collection = db["users"]
+
+# Need to start the redis server from command line 
+# redis_conn = redis.Redis(
+#     host=os.getenv("REDIS_HOST", "127.0.0.1"),
+#     port=os.getenv("REDIS_PORT", "6379"),
+#     password=os.getenv("REDIS_PASSWORD", ""),
+# )
 
 jwt_redis_blocklist = redis.StrictRedis(
     host="localhost", port=6379, db=0, decode_responses=True
@@ -86,12 +94,9 @@ def login():
     if verified_user:
         if bcrypt.check_password_hash(verified_user['password'], login_details['password']):
             isAdmin = verified_user['username'] == 'admin'
-            access_token = create_access_token(identity=verified_user['username'], additional_claims={'admin': isAdmin}, fresh=True)
+            access_token = create_access_token(identity=verified_user['username'], additional_claims={'admin': isAdmin}) # fresh=True
             # refresh_token = create_refresh_token(verified_user['username'])
-            return jsonify({
-                'access_token': access_token, 
-                # 'refresh_token': refresh_token
-            }), 200
+            return jsonify(access_token=access_token), 200
     return jsonify({'msg': 'The username or password is incorrect'}), 401
 
 @app.route('/api/v1/loadUser', methods=['GET'])
